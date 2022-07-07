@@ -10,7 +10,10 @@ dotenv.config();
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use('/api', router);
+app.use(router);
+
+app.set('view engine', 'ejs');
+app.set('views', 'views');
 
 
 app.listen(process.env.PORT, ()=> {
