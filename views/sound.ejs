@@ -4,6 +4,7 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 <body>
@@ -13,16 +14,28 @@
             <v-container>
                 <v-row class="justify-center mt-16">
                     <v-col cols="8">
-                        <v-card color="grey" height="400">
+                        <v-card color="grey" height="400" v-if="!wordResponse">
                             <v-row class="justify-center">
                                 <v-col cols="6" class="justify-center">
                                     <v-card-text class="text-center text-h6">
                                         Words that sound like {{word}}
                                     </v-card-text>
                                     <v-text-field outlined v-model="word" label="Write a word"></v-text-field>
-                                    <v-btn color="white"  block class="rounded-xl">Submit</v-btn>
+                                    <v-btn color="white" @click="submit" block class="rounded-xl">Submit</v-btn>
                                 </v-col>
                             </v-row>
+                        </v-card>
+                        <v-card color="grey" v-if="wordResponse">
+                                <v-card-text v-for="item in wordResponse">
+                                    <p>Word:
+                                        <span class="text-h6">{{item.word}}</span>
+                                    </p>
+                                    <p>Score:
+                                        <span class="text-h6">{{item.score}}</span>
+                                    </p>
+                                    <hr/>
+                                </v-card-text>
+                            </v-virtual-scroll>
                         </v-card>
                     </v-col>
                 </v-row>
@@ -37,7 +50,20 @@
         el: '#app',
         vuetify: new Vuetify(),
         data: {
-              word: 'word',
+            word: 'word',
+            wordResponse: null,
+            wordSearch: [],
+        },
+        methods: {
+            submit() {
+                axios.get(`https://api.datamuse.com/words?sl=${this.word}`).then(response => {
+                    if(response.status === 200){
+                        this.wordResponse = response.data;
+                    }
+                }).catch( error => {
+                   console.log(error);
+                });
+            }
         }
     })
 </script>
